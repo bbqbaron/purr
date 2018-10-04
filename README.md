@@ -6,6 +6,7 @@ I saw a great talk on stack-based programming and cobbled together a Clojure imp
 
 * should probably not defer directly to Clojure's reader and type system (although you could do worse)
 * try site with cljs backend
+* custom word defs
 
 ## License
 
