@@ -1,6 +1,5 @@
-(ns purr.core
-  (:require [purr.parse :refer [parse]])
-  (:gen-class))
+(ns purr.run
+  (:require [purr.parse :refer [parse]]))
 
 (defn binary [op [b a & rest]]
   [[(op a b)] rest])
@@ -80,4 +79,3 @@
        eager
        reverse
        (clojure.string/join " ")))
-

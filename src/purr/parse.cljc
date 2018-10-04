@@ -13,6 +13,10 @@
      OP = '+' | '/' | '-' | '*' | '>' | '<' | '<=' | '>=' ;
      TERM = (WORD | BLOCK | STR | NUM | OP) #' ?' ; "))
 
+(defn to-num [string]
+  #?(:clj (read-string string)
+     :cljs (js/parseFloat string 10)))
+
 (defn collapse [program]
   (clojure.walk/postwalk
     (fn [node]
@@ -22,9 +26,9 @@
             :BLOCK
             (drop 1 (butlast value))
             :STR (clojure.string/join (drop 1 (butlast (flatten value))))
-            :WORD (read-string (first value))
-            :NUM (read-string (first value))
-            :OP (read-string (first value))
+            :WORD (symbol (first value))
+            :NUM (to-num (first value))
+            :OP (symbol (first value))
             :PROGRAM value
             (first value)))
         node))

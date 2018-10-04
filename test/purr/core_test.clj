@@ -1,6 +1,6 @@
 (ns purr.core-test
-  (:require [clojure.test :refer :all]
-            [purr.core :refer [run]]))
+  (:require [clojure.test :refer [deftest is run-tests]]
+            [purr.run :refer [run]]))
 
 (deftest add
   (is (= (run "1 2 +") "3")))
@@ -57,4 +57,4 @@
 (deftest fibonacci
   (is (= (run "1 1 [dup2 +] 5 repeat") "1 1 2 3 5 8 13")))
 
-(run-tests 'purr.core-test 'purr.parse-test)
+(run-tests 'purr.core-test)

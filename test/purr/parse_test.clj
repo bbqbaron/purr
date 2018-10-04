@@ -18,3 +18,4 @@
 (deftest block
   (is (= (parse "1 [2 3]") [1 [2 3]])))
 
+(run-tests 'purr.parse-test)
