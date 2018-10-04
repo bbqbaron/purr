@@ -1,59 +1,6 @@
 (ns purr.core
+  (:require [purr.parse :refer [parse]])
   (:gen-class))
-
-(defn over-head
-  [func coll]
-  (cons
-    (func (first coll))
-    (rest coll)))
-
-(defn cons-path [depth-0]
-  (loop [func (fn [item coll] (cons item coll)) depth depth-0]
-    (if (< depth 1)
-      func
-      (recur
-        (fn [item coll]
-          (over-head
-            (partial func item)
-            coll))
-        (dec depth)))))
-
-(defn insert-at [depth word stack]
-  ((cons-path depth) word stack))
-
-(defn finish-word [{:keys [chars depth stack] :as state}]
-  (-> state
-      (merge {:stack (if (> (count chars) 0)
-                       (insert-at depth (read-string (clojure.string/join (reverse chars))) stack)
-                       stack)
-              :chars []})))
-
-(def reverse-all
-  (partial clojure.walk/postwalk
-           (fn [form]
-             (if (coll? form)
-               (reverse form)
-               form))))
-
-(defn parse
-  "Should be a recursive delimited regex or a legit parser,
-    but proved surprisingly simple to just type out."
-  [program]
-  (->> program
-       (reduce
-         (fn [state char]
-           (case char
-             \space (finish-word state)
-             \[ (-> state
-                    (update :depth inc)
-                    (update :stack
-                            (partial insert-at (:depth state) [])))
-             \] (-> state finish-word (update :depth dec))
-             (update state :chars #(cons char %))))
-         {:stack [] :chars [] :depth 0})
-       ((fn [state]
-          (-> state finish-word :stack)))
-       reverse-all))
 
 (defn binary [op [b a & rest]]
   [[(op a b)] rest])
@@ -118,10 +65,19 @@
         true (throw (Exception. (str "unrecognized: "
                                      expr " of " (type expr))))))))
 
+(def eager
+  (partial
+    clojure.walk/postwalk
+    (fn [form]
+      (if (coll? form)
+        (vec form)
+        form))))
+
 (defn run [program]
   (->> program
        parse
        (exec [] words)
+       eager
        reverse
        (clojure.string/join " ")))
 
