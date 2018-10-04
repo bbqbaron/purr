@@ -49,7 +49,11 @@
 
 (defn run-word [word lib stack]
   (let [task (get lib word)]
-    (task stack)))
+    (if task
+      (task stack)
+      (let [error (str "word not found: " word)]
+        #?(:clj  (throw (Exception. error))
+           :cljs (throw (js/Error. error)))))))
 
 (defn exec [stack-0 lib exprs-0]
   (loop [stack stack-0 exprs exprs-0]
@@ -61,8 +65,11 @@
           (recur newstack (concat newexprs (rest exprs))))
         (or (= expr true) (= expr false) (number? expr) (string? expr) (char? expr) (coll? expr))
         (recur (cons expr stack) (rest exprs))
-        true (throw (Exception. (str "unrecognized: "
-                                     expr " of " (type expr))))))))
+        true
+        (let [error (str "unrecognized: "
+                         expr " of " (type expr))]
+          #?(:clj  (throw (Exception. error))
+             :cljs (throw (js/Error error))))))))
 
 (def eager
   (partial
