@@ -13,6 +13,10 @@
    stack])
 
 (def words
+  "Map of word names to functions that return:
+  [new-expressions
+   new-stack
+   new-library]"
   {"+"      (partial binary +)
    "-"      (partial binary -)
    "*"      (partial binary *)
@@ -22,6 +26,13 @@
    "<="     (partial binary <=)
    ">="     (partial binary >=)
    "!="     (partial binary not=)
+   "def"    (fn [[fn-name body & rest]]
+              [[]
+               rest
+               {fn-name
+                (if (coll? body)
+                    body
+                    [body])}])
    "dup"    (fn [stack] [[(first stack)] stack])
    "dup2"   (fn [stack] [(reverse (take 2 stack)) stack])
    "drop"   (fn [stack] [[] (rest stack)])
@@ -50,21 +61,26 @@
 (defn run-word [word lib stack]
   (let [task (get lib word)]
     (if task
-      (task stack)
+      (if (fn? task)
+        (task stack)
+        [task stack])
       (let [error (str "word not found: " word)]
         #?(:clj  (throw (Exception. error))
            :cljs (throw (js/Error. error)))))))
 
-(defn exec [stack-0 lib exprs-0]
-  (loop [stack stack-0 exprs exprs-0]
+(defn exec [stack-0 lib-0 exprs-0]
+  (loop [stack stack-0 exprs exprs-0 lib lib-0]
     (let [expr (first exprs)]
       (cond
         (nil? expr) stack
         (symbol? expr)
-        (let [[newexprs newstack] (run-word (str expr) lib stack)]
-          (recur newstack (concat newexprs (rest exprs))))
+        (let [[newexprs newstack new-lib] (run-word (str expr) lib stack)]
+          (recur
+            newstack
+            (concat newexprs (rest exprs))
+            (merge lib new-lib)))
         (or (= expr true) (= expr false) (number? expr) (string? expr) (char? expr) (coll? expr))
-        (recur (cons expr stack) (rest exprs))
+        (recur (cons expr stack) (rest exprs) lib)
         true
         (let [error (str "unrecognized: "
                          expr " of " (type expr))]

@@ -17,19 +17,22 @@
   (let [{:keys [expr error]} (rum/react state)]
     [:div
      [:h3 "Type some code!"]
-     [:input {:on-change (fn [evt]
-                           (let [val (get-val evt)
-                                 result (try
-                                          {:expr (run val)
-                                           :error nil}
-                                          (catch js/Error e
-                                            {:error (.-message e)
-                                             :expr nil}))]
-                             (swap! state
-                                    (fn [old]
-                                      (-> old
-                                          (assoc :code val)
-                                          (merge result))))))}]
+     [:textarea
+      {:auto-focus true
+       :on-change (fn [evt]
+                    (let [val (get-val evt)
+                          result (try
+                                   {:expr  (run val)
+                                    :error nil}
+                                   (catch js/Error e
+                                     {:error (.-message e)
+                                      :expr  nil}))]
+                      (swap! state
+                             (fn [old]
+                               (-> old
+                                   (assoc :code val)
+                                   (merge result))))))
+       :rows 5}]
      (when expr
        [:p "Result: " expr])
      (when error

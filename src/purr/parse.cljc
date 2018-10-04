@@ -11,7 +11,7 @@
      BLOCK = '[' TERM* ']' ;
      NUM = #'\\-?\\d+(\\.\\d+)?' ;
      OP = '+' | '/' | '-' | '*' | '>' | '<' | '<=' | '>=' ;
-     TERM = (WORD | BLOCK | STR | NUM | OP) #' ?' ; "))
+     TERM = (WORD | BLOCK | STR | NUM | OP) #'\\s?' ; "))
 
 (defn to-num [string]
   #?(:clj (read-string string)

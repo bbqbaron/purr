@@ -57,4 +57,10 @@
 (deftest fibonacci
   (is (= (run "1 1 [dup2 +] 5 repeat") "1 1 2 3 5 8 13")))
 
+(deftest def-word-alias
+  (is (= (run "1 \"one\" def one") "1")))
+
+(deftest def-words
+  (is (= (run "[1 +] \"inc\" def 2 inc") "3")))
+
 (run-tests 'purr.core-test)

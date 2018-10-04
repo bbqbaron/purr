@@ -18,4 +18,7 @@
 (deftest block
   (is (= (parse "1 [2 3]") [1 [2 3]])))
 
+(deftest newlines
+  (is (= (parse "1\n2\n+") [1 2 '+])))
+
 (run-tests 'purr.parse-test)
