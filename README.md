@@ -4,7 +4,6 @@ I saw a great talk on stack-based programming and cobbled together a Clojure imp
 
 ## TODO
 
-* don't hand-parse the input text, my goodness
 * should probably not defer directly to Clojure's reader and type system (although you could do worse)
 
 ## License
